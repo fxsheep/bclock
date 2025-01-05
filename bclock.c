@@ -24,7 +24,7 @@
 void set_dpll(Dpll_mpu* dpll_mpu, uint8_t* map)
 {	
 	// Set the M_multiplier and N_divider
-	if ((dpll_mpu-> M_multiplier  != *(uint16_t *)(map + CM_CLKSEL_DPLL_MPU+1) & 0x3ff)
+	if ((dpll_mpu-> M_multiplier  != *(uint16_t *)(map + CM_CLKSEL_DPLL_MPU+1) & 0x7ff)
 		|| (dpll_mpu-> N_divider != map[CM_CLKSEL_DPLL_MPU] & 0x7f)
 	) {	
 			map[CM_CLKMODE_DPLL_MPU_DPLL_EN] &= ~(3); //Clear
@@ -47,7 +47,7 @@ void set_dpll(Dpll_mpu* dpll_mpu, uint8_t* map)
 void get_dpll_mpu(Dpll_mpu* dpll_mpu, uint8_t* map)
 {
 	dpll_mpu-> N_divider = map[CM_CLKSEL_DPLL_MPU] & 0x7f;
-	dpll_mpu-> M_multiplier = *(uint16_t *) (map + CM_CLKSEL_DPLL_MPU+1) & 0x3ff;
+	dpll_mpu-> M_multiplier = *(uint16_t *) (map + CM_CLKSEL_DPLL_MPU+1) & 0x7ff;
 	dpll_mpu-> M2_divider = map[CM_DIV_M2_DPLL_MPU] & 0x1f;
 }
 
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
 					if (atoi(argv[i+1]) > 0 && atoi(argv[i+1]) <= 0x7f)
 						dpll_mpu-> N_divider = atoi(argv[i+1]);
 				if (strcmp(argv[i],"-M") == 0)
-					if (atoi(argv[i+1]) > 0 && atoi(argv[i+1]) <= 0x3ff)
+					if (atoi(argv[i+1]) > 0 && atoi(argv[i+1]) <= 0x7ff)
 						dpll_mpu-> M_multiplier = atoi(argv[i+1]);
 				if (strcmp(argv[i],"-M2") == 0)
 					if (atoi(argv[i+1]) > 0 && atoi(argv[i+1]) <= 0x1f)
