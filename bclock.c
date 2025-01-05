@@ -23,22 +23,22 @@
 
 void set_dpll(Dpll_mpu* dpll_mpu, uint8_t* map)
 {	
-	// Set the M_multiplier
-	if (dpll_mpu-> M_multiplier  != *(uint16_t *)(map + CM_CLKSEL_DPLL_MPU+1) & 0x3ff) {	
+	// Set the M_multiplier and N_divider
+	if ((dpll_mpu-> M_multiplier  != *(uint16_t *)(map + CM_CLKSEL_DPLL_MPU+1) & 0x3ff)
+		|| (dpll_mpu-> N_divider != map[CM_CLKSEL_DPLL_MPU] & 0x7f)
+	) {	
 			map[CM_CLKMODE_DPLL_MPU_DPLL_EN] &= ~(3); //Clear
 			map[CM_CLKMODE_DPLL_MPU_DPLL_EN] |= DPLL_MN_BYP_MODE;
 		
 			while ( !(map[CM_IDLEST_DPLL_MPU+1] & ST_MN_BYPASS) );
 			
 			*(uint32_t *) (map + CM_CLKSEL_DPLL_MPU) |= (dpll_mpu->M_multiplier << 8);
+			map[CM_CLKSEL_DPLL_MPU] = dpll_mpu->N_divider;
+
 			map[CM_CLKMODE_DPLL_MPU_DPLL_EN] |= DPLL_LOCK_MODE;
 			while(  !(map[CM_IDLEST_DPLL_MPU] & ST_DPLL_CLK)  );
 		}
-	
-	// Set the N_divider
-	if (dpll_mpu-> N_divider != map[CM_CLKSEL_DPLL_MPU] & 0x7f)
-			map[CM_CLKSEL_DPLL_MPU] = dpll_mpu->N_divider;
-		
+
 	// Set the M2_divider
 	if (dpll_mpu-> M2_divider !=  map[CM_DIV_M2_DPLL_MPU] & 0x1f )	
 			map[CM_DIV_M2_DPLL_MPU] = dpll_mpu->M2_divider;
